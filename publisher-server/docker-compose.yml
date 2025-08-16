@@ -25,6 +25,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./conf/postgresql.conf:/etc/postgresql/postgresql.conf
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME" ]
       interval: 10s
@@ -59,6 +60,8 @@ services:
       - kafka
     ports:
       - "8083:8083"
+    env_file:
+      - .env
     environment:
       BOOTSTRAP_SERVERS: kafka:9092
       GROUP_ID: 1
@@ -70,6 +73,9 @@ services:
       INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       REST_ADVERTISED_HOST_NAME: kafka-connect
+
+    volumes:
+      - ./connectors:/connectors
 
 volumes:
   postgres_data:
